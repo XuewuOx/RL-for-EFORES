@@ -169,6 +169,7 @@ class PPO_pipline:
                 if len(self.training_cumulative_reward) > 100:
                     mean_cumulative_reward = np.mean(self.training_cumulative_reward[-100:])
                     current_time = time.strftime("%Y-%m-%d %H", time.localtime())
+                    current_timeHMS = time.strftime("%H:%M:%S", time.localtime())
                     if (mean_cumulative_reward > self.training_best_reward) or \
                         (current_time != self.last_testing_time):
                         if mean_cumulative_reward > self.training_best_reward:
@@ -179,7 +180,7 @@ class PPO_pipline:
                         need_testing = True
                     print(f'''
                     *********************************************************************************************
-                    During training session in {self.num_episodes} training episode, {current_time},
+                    During training session in {self.num_episodes} training episode, {current_timeHMS},
                     the current mean cumulative reward is {mean_cumulative_reward},
                     and the best mean cumulative reward is {self.training_best_reward}.
                     *********************************************************************************************
