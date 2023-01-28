@@ -144,7 +144,8 @@ class PPO_pipline:
         self.rollout_buffer.reset()
 
         while n_steps < self.n_steps:
-
+            # :param n_steps: The number of timesteps each time the ppo interacts with the environment and samples
+            # print("     n_steps="+str(n_steps))
             with torch.no_grad():
                 # Convert to pytorch tensor
                 state_feature = self.feature_engineering(
@@ -185,6 +186,7 @@ class PPO_pipline:
                     and the best mean cumulative reward is {self.training_best_reward}.
                     *********************************************************************************************
                     ''')
+
                 self.num_episodes += 1
                 new_obs = self.env.reset()
                 self.episode_reward = []
@@ -202,7 +204,8 @@ class PPO_pipline:
             )
             self._last_obs = new_obs
             self._last_episode_starts = done
-
+            # print("n_steps="+str(n_steps)+",done")
+        print("      All "+str(self.n_steps)+" steps DONE!")
         with torch.no_grad():
             state_feature = self.feature_engineering(
                 state=self._last_obs,
@@ -219,12 +222,12 @@ class PPO_pipline:
         """
         Update policy using the currently gathered rollout buffer.
         """
-
+        print("      self.policy.train() start")
         self.policy.train()
         # # Update optimizer learning rate
         # for param_group in self.policy.optimizer.param_groups:
         #     param_group['lr'] = learning_rate
-
+        print("      self.policy.train() done")
         all_value_loss = []
         all_policy_loss = []
         all_entropy_loss = []
@@ -285,7 +288,13 @@ class PPO_pipline:
                     loss=loss,
                     max_grad_norm=self.max_grad_norm,
                 )
-
+            # print(f''' {epoch}-th epoch completed.''')
+        print(f'''     {epoch}-th (=self.n_epochs={self.n_epochs}) epoch completed.''')   
+        print(f'''     RETURN
+            mean(all_value_loss)={np.mean(all_value_loss)},
+            mean(all_policy_loss)=np.mean(all_policy_loss), 
+            man(all_entropy_loss)=np.mean(all_entropy_loss).
+            ''')
         return np.mean(all_value_loss), np.mean(all_policy_loss), np.mean(all_entropy_loss)
 
     def test(self, test_episode_times: int = 100, deterministic: bool = True):
@@ -417,6 +426,7 @@ class PPO_pipline:
         self.params = self.get_params()
 
         # first test before training
+        print("first test before training, test_and_update_test_log() ")
         mean_cumulative_reward = self.test_and_update_test_log()
         self.testing_init_performance = mean_cumulative_reward
 
@@ -429,10 +439,17 @@ class PPO_pipline:
                 last_time = current_time
                 print(last_time)
                 self.saving()
+            print("\n================\n *.num_timesteps="+str(self.num_timesteps))
+            print("   sample_from_self_play() starts")
             need_testing = self.sample_from_self_play()
+            # self.num_timesteps inceases by .n_steps=2048 in eavery self_play()
+            print("   sample_from_self_play() ends")
+            
             # if need_testing:
             #     self.test_and_update_test_log()
+            print("   train() starts")
             mean_value_loss, mean_policy_loss, mean_entropy_loss = self.train()
+            print("   train() ends")
             # mean_policy_losss.append(deepcopy(mean_policy_loss))
             # mean_entropy_losss.append(deepcopy(mean_entropy_loss))
             # if len(mean_policy_losss) > 100:
@@ -443,7 +460,8 @@ class PPO_pipline:
             self.value_loss.append(deepcopy(mean_value_loss))
             self.policy_loss.append(deepcopy(mean_policy_loss))
             self.entropy_loss.append(deepcopy(mean_entropy_loss))
-
+      
+        print(".num_timesteps="+str(self.num_timesteps)+", total_timesteps="+str(total_timesteps)+" reaches,training completed.")
         self.load_params(self.params)
         self.test_and_update_test_log()
         self.saving()
