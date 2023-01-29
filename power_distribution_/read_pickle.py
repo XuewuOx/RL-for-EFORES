@@ -22,3 +22,15 @@ training_cumulative_reward = params_and_log['training_cumulative_reward']
 training_cumulative_reward = pd.DataFrame({'training_cumulative_reward': training_cumulative_reward})
 print(training_cumulative_reward)
 training_cumulative_reward.to_csv('training_cumulative_reward.csv')
+
+
+# read electric.pickle
+with open(project_path + '/simulation_environment/data/electric.pickle', 'rb') as file:
+  # (3, 96, 4), ((chance of coming, parking_time, volume), timestep, (max, min, mean, std))
+  electricData = pickle.load(file)
+  print(electricData.tolist())
+  print(electricData)
+
+  training_cumulative_reward = pd.DataFrame({'training_cumulative_reward': training_cumulative_reward})
+print(training_cumulative_reward)
+training_cumulative_reward.to_csv('training_cumulative_reward.csv')
