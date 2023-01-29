@@ -33,6 +33,7 @@ class rl_env:
         with open(project_path + '/simulation_environment/data/electric.pickle', 'rb') as file:
             # (3, 96, 4), ((chance of coming, parking_time, volume), timestep, (max, min, mean, std))
             self.electric = pickle.load(file)
+        
         self.charging_speed = 20
 
         # It is used to indicate whether a certain parking space is occupied among the 10 parking spaces, and how many

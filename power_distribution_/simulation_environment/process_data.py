@@ -76,6 +76,8 @@ def process_electric_data():
     ]
     electric.sort_values(by='timestamp', inplace=True, ignore_index=True)
 
+    # Recorde the number of arriving EVs, at the specified interval (15min), every day
+    # for the whole year 2017-01-03 to 2017-11-16   
     length_statistics = {}
     start_time = pd.to_datetime('2017-01-03 17:45:00')
     while start_time < pd.to_datetime('2017-11-16 23:15:00'):
@@ -96,7 +98,13 @@ def process_electric_data():
     start_str = str(start_time)[11:]
     end_str = str(end_time)[11:]
     go_iter = True
+    # To calculate the statistics of EV arriaval and charging demand, at interval of 15 min
     # ((chance of coming, parking_time, volume), timestep, (max, min, mean, std))
+    # data format, 
+    # dimention 0:  [max, min, mean, std] of the number of arrival EVs at k-th interval
+    # dimention 1:  [max, min, mean, std] of the parking time at k-th interval
+    # dimention 3:  [max, min, mean, std] of the EV charging consumption at the k-th interval
+    # k=0,1, ...95
     v_statistics = np.zeros((3, 96, 4))
     n = 0
     while go_iter:
