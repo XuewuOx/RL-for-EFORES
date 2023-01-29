@@ -1,2 +1,7 @@
-power_distribution_/simulation_environment/original_data/electric.xls
-power_distribution_/common (8341 training episodes).pickle
+*.pickle
+*.xls
+*.ppt
+power_distribution_/其它/*.*
+
+power_distribution_/simulation_environment/original_data/*.xls
+power_distribution_/*.pickle
